@@ -81,8 +81,8 @@ for x in range(0,L):
     z_thres[x] = np.random.choice([1,2], p = [prob,1-prob])
 
 data = {}
-R = 11 # Number of Realisations is R-1
-I = 100000
+R = 2 # Number of Realisations is R-1
+I = 2000000
 g = np.array([4,8,16,32,64,128,256])
 for j in range(len(g)):
     for h in range(1,R):
@@ -343,7 +343,8 @@ plt.plot(time, data[256,1][0], 'x', label = "L = 256")
 #plt.xlabel("Time (Number grains added)", size = "13")
 plt.xlabel("$t$", size = "14")
 plt.ylabel("$h(t; L)$", size = "14")
-
+plt.xscale("log")
+plt.yscale("log")
 plt.legend()
 plt.grid()
 plt.show()
@@ -367,11 +368,19 @@ def Square(x, m, c):
     y = m*(x**2) + c 
     return y 
 
+def Plaw(x, m, k):
+    y = m*(x**k)
+    return y
+
 arO = np.arange(4, 256, 0.01)
-p0 = np.array([700000, -2.22])
-p, cov = opt.curve_fit(Square, g, t_c_AV, p0)
+#p0 = np.array([700000, -2.22])
+#p, cov = opt.curve_fit(Square, g, t_c_AV, p0)
+#plt.plot(arO, Square(arO, p[0], p[1]), zorder=10,color = 'red')
+##pl.errorbar(m_array_mod, N, xerr = err_TO, yerr = err_lnO, color = "royalblue", fmt='o', mew=1, ms=0.2, capsize=6)
+
+p0 = np.array([0.8, 2])
+p, cov = opt.curve_fit(Plaw, g, t_c_AV, p0)
 plt.plot(arO, Square(arO, p[0], p[1]), zorder=10,color = 'red')
-#pl.errorbar(m_array_mod, N, xerr = err_TO, yerr = err_lnO, color = "royalblue", fmt='o', mew=1, ms=0.2, capsize=6)
 
 #plt.plot(L_list, av_t_L, "x")
 plt.plot(g, t_c_AV, "x")
@@ -509,10 +518,10 @@ avg_H_sq = np.array(avgHsq)
 sigma = np.sqrt(avg_H_sq - np.square(avg_H))
 
 def PLaw(x, m, k):
-    y = m*(x**-k)
+    y = m*(x**k)
     return y 
 
-arO = np.arange(0, 256, 0.0001)
+arO = np.arange(4, 256, 0.0001)
 p0 = np.array([0.2, 0.58])
 p, cov = opt.curve_fit(PLaw, g, sigma, p0)
 plt.plot(arO, PLaw(arO, p[0], p[1]), zorder=10, color = 'red')
@@ -642,29 +651,39 @@ plt.show()
 """ Task 3a)b): Cutoff avalanche size vs System size; Parameter D """
 plt.figure()
 
-s_c = [np.amax(bin_4[0]), np.amax(bin_8[0]), np.amax(bin_16[0]), np.amax(bin_32[0]), 
-       np.amax(bin_64[0]), np.amax(bin_128[0]), np.amax(bin_256[0])]
+s_c = np.array([np.amax(bin_4[0]), np.amax(bin_8[0]), np.amax(bin_16[0]), np.amax(bin_32[0]), 
+       np.amax(bin_64[0]), np.amax(bin_128[0]), np.amax(bin_256[0])])
 
 def PLaw(x, m, k):
-    y = m*(x**-k)
+    y = m*(x**k)
     return y 
 
-def Corr(x, b0, D, b1, w1):
-    y = b0*(x**D)*(1 + b1*(x**-w1))
-    return y 
+#def Corr(x, b0, D, b1, w1):
+#    y = b0*(x**D)*(1 + b1*(x**-w1))
+#    return y 
 
-arO = np.arange(4, 256, 0.0001)
-p0 = np.array([1, 2.2])
+def Linear(x,m,c):
+    y = m*x + c
+    return y
+
+
+#arO = np.arange(np.log10(4), np.log10(256), 0.0001) # Linear
+#p0 = np.array([2.02, 0])
+#p, cov = opt.curve_fit(Linear, np.log10(g[3:]), np.log10(s_c[3:]), p0)
+#plt.plot(arO, Linear(arO, p[0], p[1]), zorder=10, color = 'red')
+#plt.plot(np.log10(g), np.log10(s_c), 'x') #Linear
+
+arO = np.arange(4, 256, 0.0001) # Plaw
+p0 = np.array([2.439, 2.1897]) 
 p, cov = opt.curve_fit(PLaw, g[3:], s_c[3:], p0)
 plt.plot(arO, PLaw(arO, p[0], p[1]), zorder=10, color = 'red')
+plt.plot(g, s_c, 'x') # Plaw
 
 #p0 = np.array([1, 2.2, 0.5, 0.5])
 #p, cov = opt.curve_fit(Corr, g, s_c, p0)
 #plt.plot(arO, Corr(arO, p[0], p[1], p[2], p[3]), zorder=10, color = 'red')
 
 #pl.errorbar(m_array_mod, N, xerr = err_TO, yerr = err_lnO, color = "royalblue", fmt='o', mew=1, ms=0.2, capsize=6)
-
-plt.plot(g, s_c, 'x')
 
 plt.xscale("log")
 plt.yscale("log")
@@ -721,6 +740,11 @@ tau = 1.556 # Theoretical based off D
 #tau = 1.539 # Experimental Value from plot bin_256[16:39]
 D = 2.254 # Experimental Value from plot
 
+## 2M; 2
+#tau = 1.537 # Experimental 
+#D = 2.16 # Theoretical Value
+##D = 1.731 # Experimental Value from plot
+
 y_scl = np.array([np.array(bin_4[0]), np.array(bin_8[0]), np.array(bin_16[0]),
                  np.array(bin_32[0]), np.array(bin_64[0]), np.array(bin_128[0]),
                  np.array(bin_256[0])])**tau
@@ -739,6 +763,7 @@ plt.xlabel("$s/L^D$", size = "14")
 plt.ylabel(r'$ \~P(s; L) s^{\tau_s} $', size = "14")
 plt.legend()
 plt.grid()
+#plt.savefig("Task 3aa Data Collapse.pdf", dpi = 1000)
 plt.show()
 #%% # PLOTTING
 """ Task 3b: Measuring the kth moment in the steady state vs System size L """
@@ -749,10 +774,10 @@ plt.plot(g, kth_moment[1], label = "k = 2")
 plt.plot(g, kth_moment[2], label = "k = 3")
 plt.plot(g, kth_moment[3], label = "k = 4")
 plt.plot(g, kth_moment[4], label = "k = 5")
-plt.plot(g, kth_moment[5], label = "k = 6")
-plt.plot(g, kth_moment[6], label = "k = 7")
-plt.plot(g, kth_moment[7], label = "k = 8")
-plt.plot(g, kth_moment[8], label = "k = 9")
+#plt.plot(g, kth_moment[5], label = "k = 6")
+#plt.plot(g, kth_moment[6], label = "k = 7")
+#plt.plot(g, kth_moment[7], label = "k = 8")
+#plt.plot(g, kth_moment[8], label = "k = 9")
 
 plt.xscale("log")
 plt.yscale("log")
@@ -760,6 +785,7 @@ plt.xlabel("$L$", size = "14")
 plt.ylabel(r'$\langle s^k \rangle $', size = "14")
 plt.grid()
 plt.legend()
+#plt.savefig("Task 3b.pdf", dpi = 1000)
 plt.show()
 #%% # PLOTTING
 """ Task 3b: Measuring the kth moment in the steady state vs System size L: Fitted Functions """
@@ -770,7 +796,7 @@ plt.plot(g, kth_moment[1], 'x', label = "k = 2")
 plt.plot(g, kth_moment[2], 'x', label = "k = 3")
 plt.plot(g, kth_moment[3], 'x', label = "k = 4")
 plt.plot(g, kth_moment[4], 'x', label = "k = 5")
-plt.plot(g, kth_moment[5], 'x', label = "k = 6")
+#plt.plot(g, kth_moment[5], 'x', label = "k = 6")
 #plt.plot(g, kth_moment[6], 'x', label = "k = 7")
 #plt.plot(g, kth_moment[7], 'x', label = "k = 8")
 #plt.plot(g, kth_moment[8], 'x', label = "k = 9")
@@ -795,14 +821,14 @@ po1, cov1 = opt.curve_fit(PLaw, g, kth_moment[1], p1)
 po2, cov2 = opt.curve_fit(PLaw, g, kth_moment[2], p2)
 po3, cov3 = opt.curve_fit(PLaw, g, kth_moment[3], p3)
 po4, cov4 = opt.curve_fit(PLaw, g, kth_moment[4], p4)
-po5, cov5 = opt.curve_fit(PLaw, g, kth_moment[5], p5)
+#po5, cov5 = opt.curve_fit(PLaw, g, kth_moment[5], p5)
 
 plt.plot(arO, PLaw(arO, po0[0], po0[1]), zorder=10, color = 'royalblue', label = "Fitted Function")
 plt.plot(arO, PLaw(arO, po1[0], po1[1]), zorder=10, color = 'royalblue')
 plt.plot(arO, PLaw(arO, po2[0], po2[1]), zorder=10, color = 'royalblue')
 plt.plot(arO, PLaw(arO, po3[0], po3[1]), zorder=10, color = 'royalblue')
 plt.plot(arO, PLaw(arO, po4[0], po4[1]), zorder=10, color = 'royalblue')
-plt.plot(arO, PLaw(arO, po5[0], po5[1]), zorder=10, color = 'royalblue')
+#plt.plot(arO, PLaw(arO, po5[0], po5[1]), zorder=10, color = 'royalblue')
 
 plt.xscale("log")
 plt.yscale("log")
@@ -810,25 +836,58 @@ plt.xlabel("$L$", size = "14")
 plt.ylabel(r'$\langle s^k \rangle $', size = "14")
 plt.grid()
 plt.legend()
+#plt.savefig("Task 3b Fitted.pdf", dpi = 1000)
+plt.show()
+#%% 
+""" Task 3b: kth moment; Revealing corrections to scaling """
+plt.figure()
+
+def err_alpha(k):
+    A = (np.square(1+k-1.53929)+np.square(2.2535315))*0.01
+    B = np.sqrt(A)
+    return B
+
+def err_scl(alpha, A, L, err_alph): # A is the kth moment of s 
+    A = alpha*A*(L**(-alpha-1))*err_alph
+    return A
+##%%
+scale_k0 = np.array(g**alpha[0])
+scale_k1 = np.array(g**alpha[1])
+scale_k2 = np.array(g**alpha[2])
+scale_k3 = np.array(g**alpha[3])
+scale_k4 = np.array(g**alpha[4])
+
+plt.plot(g, np.array(kth_moment[0])/scale_k0, label = "k = 1")
+plt.plot(g, np.array(kth_moment[1])/scale_k1, label = "k = 2")
+plt.plot(g, np.array(kth_moment[2])/scale_k2, label = "k = 3")
+plt.plot(g, np.array(kth_moment[3])/scale_k3, label = "k = 4")
+
+#y_err = mp.array([])
+
+y_err0 = err_scl(alpha[0], np.array(kth_moment[0])/scale_k0, g, err_alpha(1))
+y_err1 = err_scl(alpha[1], np.array(kth_moment[1])/scale_k1, g, err_alpha(2))
+y_err2 = err_scl(alpha[2], np.array(kth_moment[2])/scale_k2, g, err_alpha(3))
+y_err3 = err_scl(alpha[3], np.array(kth_moment[3])/scale_k3, g, err_alpha(4))
+#y_err4 = err_scl(alpha[4], np.array(kth_moment[4])/scale_k0, g, err_alpha(5))
+
+plt.errorbar(g, np.array(kth_moment[0])/scale_k0, yerr = y_err0, color = "royalblue", fmt='o', mew=1, ms=0.2, capsize=6)
+plt.errorbar(g, np.array(kth_moment[1])/scale_k1, yerr = y_err1, color = "royalblue", fmt='o', mew=1, ms=0.2, capsize=6)
+plt.errorbar(g, np.array(kth_moment[2])/scale_k2, yerr = y_err2, color = "royalblue", fmt='o', mew=1, ms=0.2, capsize=6)
+plt.errorbar(g, np.array(kth_moment[3])/scale_k3, yerr = y_err3, color = "royalblue", fmt='o', mew=1, ms=0.2, capsize=6)
+#plt.errorbar(g, np.array(kth_moment[4])/scale_k0, yerr = y_err4, color = "royalblue", fmt='o', mew=1, ms=0.2, capsize=6)
+
+
+
+
+#plt.xscale("log")
+#plt.yscale("log")
+plt.xlabel("$L$", size = "14")
+plt.ylabel(r'$\langle s^k \rangle /L^{D(1+k-\tau_s)} $', size = "14")
+plt.grid()
+plt.legend()
+#plt.savefig("Task 3b Scaling.pdf", dpi = 1000)
 plt.show()
 
-#for c in zip(po0, np.sqrt(np.diag(cov0))):#zips root of diag of cov matrix with related value in curve fit
-#    print('%.15f pm %.4g' % (c[0], c[1]))#prints value and uncertainty, f is decimal places and G is sig figs
-#
-#for c in zip(po1, np.sqrt(np.diag(cov1))):#zips root of diag of cov matrix with related value in curve fit
-#    print('%.15f pm %.4g' % (c[0], c[1]))#prints value and uncertainty, f is decimal places and G is sig figs
-#
-#for c in zip(po2, np.sqrt(np.diag(cov2))):#zips root of diag of cov matrix with related value in curve fit
-#    print('%.15f pm %.4g' % (c[0], c[1]))#prints value and uncertainty, f is decimal places and G is sig figs
-#
-#for c in zip(po3, np.sqrt(np.diag(cov3))):#zips root of diag of cov matrix with related value in curve fit
-#    print('%.15f pm %.4g' % (c[0], c[1]))#prints value and uncertainty, f is decimal places and G is sig figs
-#
-#for c in zip(po4, np.sqrt(np.diag(cov4))):#zips root of diag of cov matrix with related value in curve fit
-#    print('%.15f pm %.4g' % (c[0], c[1]))#prints value and uncertainty, f is decimal places and G is sig figs
-#
-#for c in zip(po5, np.sqrt(np.diag(cov5))):#zips root of diag of cov matrix with related value in curve fit
-#    print('%.15f pm %.4g' % (c[0], c[1]))#prints value and uncertainty, f is decimal places and G is sig figs
 #%%
 """ Task 3b: Moment Analysis to determine D and tau from kth moment """
 plt.figure()
@@ -851,6 +910,7 @@ plt.plot(k_i, alph, 'x')
 plt.xlabel("$k$", size = "14")
 plt.ylabel(r'$ D( 1 + k - \tau_s)$', size = "14")
 plt.grid()
+#plt.savefig("Task 3b Moment Analysis.pdf", dpi = 1000)
 #plt.legend()
 plt.show()
 
