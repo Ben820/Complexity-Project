@@ -62,7 +62,7 @@ def Algrithm(Iterations):
 
 # System size L
 L = 4
-prob = 0.5
+prob = 0.5 
 
 tc = np.array([False])
 s = np.array([0,0,0])
@@ -82,8 +82,9 @@ for x in range(0,L):
 
 data = {}
 R = 2 # Number of Realisations is R-1
-I = 2000000
+I = 50000
 g = np.array([4,8,16,32,64,128,256])
+#g = np.array([16,32,128])
 for j in range(len(g)):
     for h in range(1,R):
         Algrithm(I)
@@ -119,6 +120,7 @@ for j in range(len(g)):
 R = 2 # Number of Realisations is R-1
 I = 1500000
 g = np.array([4,8,16,32,64,128,256])
+#g = np.array([128])
 t_c_av = [[],[],[],[],[],[],[]]
 
 for e in range(len(g)):
@@ -151,7 +153,7 @@ List_Num = []
 List_S = []
 
 for e in range(len(g)):#7):
-    for i in range(len(data[4,1][0])):
+    for i in range(len(data[128,1][0])):
         if i > t_c_av[e][0]:
             List_Hei.append(data[g[e],1][0][i])
             List_Num.append(data[g[e],1][1][i])
@@ -212,7 +214,7 @@ for e in range(len(g)):
 dataTC = {}
 List_Val = []
 for e in range(len(g)):#7):
-    for i in range(len(data[4,1][0])):
+    for i in range(len(data[128,1][0])):
         if i > t_c_av[e][0]:
             List_Val.append(data[g[e],1][0][i])
             dataTC[g[e]] = List_Val
@@ -221,6 +223,7 @@ for e in range(len(g)):#7):
 Y = np.array([np.size(dataTC[4]), np.size(dataTC[8]), np.size(dataTC[16]), 
               np.size(dataTC[32]), np.size(dataTC[64]), np.size(dataTC[128]),
               np.size(dataTC[256])])
+#Y = np.array([np.size(dataTC[128])])
 
 Count = {}
 
@@ -264,7 +267,7 @@ for k in range(7):
 dataTCP = {}
 S_list = []
 for e in range(len(g)):#7):
-    for i in range(len(data[4,1][0])):
+    for i in range(len(data[128,1][0])):
         if i > t_c_av[e][0]:
             S_list.append(data[g[e],1][2][i])
             dataTCP[g[e]] = S_list
@@ -329,24 +332,26 @@ plt.show()
 plt.figure()
 #data = data000 
 
-time = np.arange(1, len(data[4,1][0])+1)
+time = np.arange(1, len(data[4,1][0][:100000])+1)
 
-plt.plot(time, data[4,1][0], 'x', label = "L = 4")
-plt.plot(time, data[8,1][0], 'x', label = "L = 8")
-plt.plot(time, data[16,1][0], 'x', label = "L = 16")
-plt.plot(time, data[32,1][0], 'x', label = "L = 32")
-plt.plot(time, data[64,1][0], 'x', label = "L = 64")
-plt.plot(time, data[128,1][0], 'x', label = "L = 128")
-plt.plot(time, data[256,1][0], 'x', label = "L = 256")
+plt.plot(time, data[4,1][0][:100000], '.', label = "L = 4")
+plt.plot(time, data[8,1][0][:100000], '.', label = "L = 8")
+plt.plot(time, data[16,1][0][:100000], '.', label = "L = 16")
+plt.plot(time, data[32,1][0][:100000], '.', label = "L = 32")
+plt.plot(time, data[64,1][0][:100000], '.', label = "L = 64")
+plt.plot(time, data[128,1][0][:100000], '.', label = "L = 128")
+plt.plot(time, data[256,1][0][:100000], '.', label = "L = 256")
 
-
+#[:100000]
 #plt.xlabel("Time (Number grains added)", size = "13")
-plt.xlabel("$t$", size = "14")
-plt.ylabel("$h(t; L)$", size = "14")
-plt.xscale("log")
-plt.yscale("log")
+plt.xlabel("Time, $t$", size = "15")
+plt.ylabel("Height of the pile, $h(t; L)$", size = "15")
+plt.xlim(-8000,105000)
+#plt.xscale("log")
+#plt.yscale("log")
 plt.legend()
 plt.grid()
+#plt.savefig("Task 2a.png", dpi = 1000)
 plt.show()
 #%% # PLOTTING
 """ Task 2b: Average cross-over-time vs System size; Fitted """
@@ -380,16 +385,17 @@ arO = np.arange(4, 256, 0.01)
 
 p0 = np.array([0.8, 2])
 p, cov = opt.curve_fit(Plaw, g, t_c_AV, p0)
-plt.plot(arO, Square(arO, p[0], p[1]), zorder=10,color = 'red')
+plt.plot(arO, Plaw(arO, p[0], p[1]), zorder=10,color = 'red')
 
 #plt.plot(L_list, av_t_L, "x")
 plt.plot(g, t_c_AV, "x")
 
-plt.xlabel("$L$", size = "14")
-plt.ylabel(r'$\langle t_c \rangle$', size = "14")
+plt.xlabel("System size, $L$", size = "15")
+plt.ylabel(r'Average cross-over time, $\langle t_c \rangle$', size = "15")
 plt.xscale("log")
 plt.yscale("log")
 plt.grid()
+#plt.savefig("Task 2b.png", dpi = 1000)
 plt.show()
 
 for c in zip(p, np.sqrt(np.diag(cov))):#zips root of diag of cov matrix with related value in curve fit
@@ -419,8 +425,8 @@ plt.plot(time, height_proc_256, 'x', label = "L = 256")
 plt.xscale("log")
 plt.yscale("log")
 
-plt.xlabel("$ t $", size = "14")
-plt.ylabel(" $ \~h(t; L) $", size = "14")
+plt.xlabel("Time, $ t $", size = "15")
+plt.ylabel(" $ \~h(t; L) $", size = "15")
 plt.legend()
 plt.grid()
 plt.show()
@@ -428,13 +434,13 @@ plt.show()
 """ Task 2d: Processed Height vs Time; Collapsed """
 plt.figure()
 
-height_proc_4 = (1/(R-1))*(np.array(dataA[4,1][0]) + np.array(dataA[4,2][0]) + np.array(dataA[4,3][0]) + np.array(dataA[4,4][0]) + np.array(dataA[4,5][0]))
-height_proc_8 = (1/(R-1))*(np.array(dataA[8,1][0]) + np.array(dataA[8,2][0]) + np.array(dataA[8,3][0]) + np.array(dataA[8,4][0]) + np.array(dataA[8,5][0]))
-height_proc_16 = (1/(R-1))*(np.array(dataA[16,1][0]) + np.array(dataA[16,2][0]) + np.array(dataA[16,3][0]) + np.array(dataA[16,4][0]) + np.array(dataA[16,5][0]))
-height_proc_32 = (1/(R-1))*(np.array(dataA[32,1][0]) + np.array(dataA[32,2][0]) + np.array(dataA[32,3][0]) + np.array(dataA[32,4][0]) + np.array(dataA[32,5][0]))
-height_proc_64 = (1/(R-1))*(np.array(dataA[64,1][0]) + np.array(dataA[64,2][0]) + np.array(dataA[64,3][0]) + np.array(dataA[64,4][0]) + np.array(dataA[64,5][0]))
-height_proc_128 = (1/(R-1))*(np.array(dataA[128,1][0]) + np.array(dataA[128,2][0]) + np.array(dataA[128,3][0]) + np.array(dataA[128,4][0]) + np.array(dataA[128,5][0]))
-height_proc_256 = (1/(R-1))*(np.array(dataA[256,1][0]) + np.array(dataA[256,2][0]) + np.array(dataA[256,3][0]) + np.array(dataA[256,4][0]) + np.array(dataA[256,5][0]))
+height_proc_4 = (1/(R-1))*(np.array(dataA[4,1][0]) + np.array(dataA[4,2][0]) + np.array(dataA[4,3][0]) + np.array(dataA[4,4][0]) + np.array(dataA[4,5][0]) + np.array(dataA[4,6][0]) + np.array(dataA[4,7][0]) + np.array(dataA[4,8][0]) + np.array(dataA[4,9][0]) + np.array(dataA[4,10][0]))
+height_proc_8 = (1/(R-1))*(np.array(dataA[8,1][0]) + np.array(dataA[8,2][0]) + np.array(dataA[8,3][0]) + np.array(dataA[8,4][0]) + np.array(dataA[8,5][0]) + np.array(dataA[8,6][0]) + np.array(dataA[8,7][0]) + np.array(dataA[8,8][0]) + np.array(dataA[8,9][0]) + np.array(dataA[8,10][0]))
+height_proc_16 = (1/(R-1))*(np.array(dataA[16,1][0]) + np.array(dataA[16,2][0]) + np.array(dataA[16,3][0]) + np.array(dataA[16,4][0]) + np.array(dataA[16,5][0]) + np.array(dataA[16,6][0]) + np.array(dataA[16,7][0]) + np.array(dataA[16,8][0]) + np.array(dataA[16,9][0]) + np.array(dataA[16,10][0]))
+height_proc_32 = (1/(R-1))*(np.array(dataA[32,1][0]) + np.array(dataA[32,2][0]) + np.array(dataA[32,3][0]) + np.array(dataA[32,4][0]) + np.array(dataA[32,5][0]) + np.array(dataA[32,6][0]) + np.array(dataA[32,7][0]) + np.array(dataA[32,8][0]) + np.array(dataA[32,9][0]) + np.array(dataA[32,10][0]))
+height_proc_64 = (1/(R-1))*(np.array(dataA[64,1][0]) + np.array(dataA[64,2][0]) + np.array(dataA[64,3][0]) + np.array(dataA[64,4][0]) + np.array(dataA[64,5][0]) + np.array(dataA[64,6][0]) + np.array(dataA[64,7][0]) + np.array(dataA[64,8][0]) + np.array(dataA[64,9][0]) + np.array(dataA[64,10][0]))
+height_proc_128 = (1/(R-1))*(np.array(dataA[128,1][0]) + np.array(dataA[128,2][0]) + np.array(dataA[128,3][0]) + np.array(dataA[128,4][0]) + np.array(dataA[128,5][0]) + np.array(dataA[128,6][0]) + np.array(dataA[128,7][0]) + np.array(dataA[128,8][0]) + np.array(dataA[128,9][0]) + np.array(dataA[128,10][0]))
+height_proc_256 = (1/(R-1))*(np.array(dataA[256,1][0]) + np.array(dataA[256,2][0]) + np.array(dataA[256,3][0]) + np.array(dataA[256,4][0]) + np.array(dataA[256,5][0]) + np.array(dataA[256,6][0]) + np.array(dataA[256,7][0]) + np.array(dataA[256,8][0]) + np.array(dataA[256,9][0]) + np.array(dataA[256,10][0]))
 
 time = np.arange(1, len(height_proc_4)+1)
 
@@ -457,10 +463,11 @@ plt.plot(time/(256**2), height_proc_256/256, label = "L = 256")
 plt.xscale("log")
 plt.yscale("log")
 
-plt.xlabel("$ t / L^2 $", size = "14")
-plt.ylabel(" $ \~h(t; L) / L $", size = "14")
+plt.xlabel("$ t / L^2 $", size = "15")
+plt.ylabel("$ \~h(t; L) / L $", size = "15")
 plt.legend()
 plt.grid()
+#plt.savefig("Task 2d.png", dpi = 1000)
 plt.show()
 #%% # PLOTTING
 """ Task 2e: Time averaged height vs System size """
@@ -485,15 +492,15 @@ def Corr(x, a0, a1, w1):
 
 arO = np.arange(0, 256, 0.0001)
 p0 = np.array([1.7, 1, 0.64])
-p, cov = opt.curve_fit(Corr, g, avg_H, p0)
+p, cov = opt.curve_fit(Corr, g[3:], avg_H[3:], p0)
 plt.plot(arO, Corr(arO, p[0], p[1], p[2]), zorder=10,color = 'red')
 #pl.errorbar(m_array_mod, N, xerr = err_TO, yerr = err_lnO, color = "royalblue", fmt='o', mew=1, ms=0.2, capsize=6)
 
 #plt.plot(g, Linear(g,1.7,0.0001), "red")
 plt.plot(g, avg_H, 'x')
 
-plt.xlabel("$L$", size = "14")
-plt.ylabel(r'$\langle h(t; L) \rangle _t $', size = "14")
+plt.xlabel("$L$", size = "15")
+plt.ylabel(r'$\langle h(t; L) \rangle _t $', size = "15")
 plt.grid()
 plt.show()
 
@@ -530,8 +537,8 @@ plt.plot(arO, PLaw(arO, p[0], p[1]), zorder=10, color = 'red')
 
 plt.plot(g, sigma, 'x')
 
-plt.xlabel("$L$", size = "14")
-plt.ylabel(r'$\sigma_h(L) $', size = "14")
+plt.xlabel("$L$", size = "15")
+plt.ylabel(r'$\sigma_h(L) $', size = "15")
 plt.xscale("log")
 plt.yscale("log")
 #plt.grid()
@@ -559,8 +566,8 @@ plt.plot(Val[4], Prob[4], label = "L = 64")
 plt.plot(Val[5], Prob[5], label = "L = 128")
 plt.plot(Val[6], Prob[6], label = "L = 256")
 
-plt.xlabel("$h$", size = "14")
-plt.ylabel("$P(h; L)$", size = "14")
+plt.xlabel("$h$", size = "15")
+plt.ylabel("$P(h; L)$", size = "15")
 plt.legend()
 plt.grid()
 plt.show()
@@ -584,8 +591,8 @@ x2 = np.arange(-4, 6, 0.00001)
 plt.plot(x2, lm.models.gaussian(x2, p0G[0], p0G[1], p0G[2]), linewidth=2, 
          color = "black", linestyle='dashed', label = "Gaussian fit\n $\mu$ = 0 ;$\sigma$ = 1")
 
-plt.xlabel(r'$ (h - \langle h(t; L) \rangle _t )/\sigma_h(L) $', size = "14")
-plt.ylabel("$ P(h; L)\sigma_h(L) $", size = "14")
+plt.xlabel(r'$ (h - \langle h(t; L) \rangle _t )/\sigma_h(L) $', size = "15")
+plt.ylabel("$ P(h; L)\sigma_h(L) $", size = "15")
 plt.legend()
 plt.grid()
 plt.show()
@@ -602,8 +609,8 @@ plt.plot(Val_S[4], Prob_S[4], label = "L = 64")
 plt.plot(Val_S[5], Prob_S[5], label = "L = 128")
 plt.plot(Val_S[6], Prob_S[6], label = "L = 256")
 
-plt.xlabel("Height of System", size = "13")
-plt.ylabel("Probability", size = "13")
+plt.xlabel("Height of System", size = "15")
+plt.ylabel("Probability", size = "15")
 plt.xscale("log")
 plt.yscale("log")
 plt.legend()
@@ -642,8 +649,8 @@ plt.plot(bin_256[0], bin_256[1], label = "L = 256")
 
 plt.xscale("log")
 plt.yscale("log")
-plt.xlabel("$s$", size = "14")
-plt.ylabel("$\~P(s; L)$", size = "14")
+plt.xlabel("$s$", size = "15")
+plt.ylabel("$\~P(s; L)$", size = "15")
 plt.legend()
 plt.grid()
 plt.show()
@@ -687,8 +694,8 @@ plt.plot(g, s_c, 'x') # Plaw
 
 plt.xscale("log")
 plt.yscale("log")
-plt.xlabel("$L$", size = "14")
-plt.ylabel("$ s_c(L) $", size = "14")
+plt.xlabel("$L$", size = "15")
+plt.ylabel("$ s_c(L) $", size = "15")
 plt.grid()
 plt.show()
 
@@ -719,8 +726,8 @@ plt.plot(bin_256[0], bin_256[1], 'x', label = "L = 256")
 
 plt.xscale("log")
 plt.yscale("log")
-plt.xlabel("$s$", size = "14")
-plt.ylabel("$\~P(s; L)$", size = "14")
+plt.xlabel("$s$", size = "15")
+plt.ylabel("$\~P(s; L)$", size = "15")
 plt.legend()
 plt.grid()
 plt.show()
@@ -759,11 +766,11 @@ plt.plot(bin_256[0]/ s_c[6], y_scl[6]*bin_256[1], label = "L = 256")
 
 plt.xscale("log")
 plt.yscale("log")
-plt.xlabel("$s/L^D$", size = "14")
-plt.ylabel(r'$ \~P(s; L) s^{\tau_s} $', size = "14")
+plt.xlabel("$s/L^D$", size = "15")
+plt.ylabel(r'$ \~P(s; L) s^{\tau_s} $', size = "15")
 plt.legend()
 plt.grid()
-#plt.savefig("Task 3aa Data Collapse.pdf", dpi = 1000)
+#plt.savefig("Task 3aa Data Collapse.png", dpi = 1000)
 plt.show()
 #%% # PLOTTING
 """ Task 3b: Measuring the kth moment in the steady state vs System size L """
@@ -781,11 +788,11 @@ plt.plot(g, kth_moment[4], label = "k = 5")
 
 plt.xscale("log")
 plt.yscale("log")
-plt.xlabel("$L$", size = "14")
-plt.ylabel(r'$\langle s^k \rangle $', size = "14")
+plt.xlabel("$L$", size = "15")
+plt.ylabel(r'$\langle s^k \rangle $', size = "15")
 plt.grid()
 plt.legend()
-#plt.savefig("Task 3b.pdf", dpi = 1000)
+#plt.savefig("Task 3b.png", dpi = 1000)
 plt.show()
 #%% # PLOTTING
 """ Task 3b: Measuring the kth moment in the steady state vs System size L: Fitted Functions """
@@ -832,11 +839,11 @@ plt.plot(arO, PLaw(arO, po4[0], po4[1]), zorder=10, color = 'royalblue')
 
 plt.xscale("log")
 plt.yscale("log")
-plt.xlabel("$L$", size = "14")
-plt.ylabel(r'$\langle s^k \rangle $', size = "14")
+plt.xlabel("$L$", size = "15")
+plt.ylabel(r'$\langle s^k \rangle $', size = "15")
 plt.grid()
 plt.legend()
-#plt.savefig("Task 3b Fitted.pdf", dpi = 1000)
+#plt.savefig("Task 3b Fitted.png", dpi = 1000)
 plt.show()
 #%% 
 """ Task 3b: kth moment; Revealing corrections to scaling """
@@ -881,11 +888,11 @@ plt.errorbar(g, np.array(kth_moment[3])/scale_k3, yerr = y_err3, color = "royalb
 
 #plt.xscale("log")
 #plt.yscale("log")
-plt.xlabel("$L$", size = "14")
-plt.ylabel(r'$\langle s^k \rangle /L^{D(1+k-\tau_s)} $', size = "14")
+plt.xlabel("$L$", size = "15")
+plt.ylabel(r'$\langle s^k \rangle /L^{D(1+k-\tau_s)} $', size = "15")
 plt.grid()
 plt.legend()
-#plt.savefig("Task 3b Scaling.pdf", dpi = 1000)
+#plt.savefig("Task 3b Scaling.png", dpi = 1000)
 plt.show()
 
 #%%
@@ -907,10 +914,10 @@ plt.plot(arO, Linear(arO, p[0], p[1]), zorder=10, color = 'red')
 
 plt.plot(k_i, alph, 'x')
 
-plt.xlabel("$k$", size = "14")
-plt.ylabel(r'$ D( 1 + k - \tau_s)$', size = "14")
+plt.xlabel("$k$", size = "15")
+plt.ylabel(r'$ D( 1 + k - \tau_s)$', size = "15")
 plt.grid()
-#plt.savefig("Task 3b Moment Analysis.pdf", dpi = 1000)
+#plt.savefig("Task 3b Moment Analysis.png", dpi = 1000)
 #plt.legend()
 plt.show()
 
@@ -927,3 +934,18 @@ tau_est = -p[1]/p[0] + 1
 
 print("x-intercept:")
 print(-p[1]/p[0])
+#%%
+""" TESTING: p = 0.5; 0th moment (average avalanche size) = L """
+plt.figure()
+
+plt.plot(g, kth_moment[0]/g)
+plt.plot(g, kth_moment[0]/g, 'x')
+
+#plt.xscale("log")
+#plt.yscale("log")
+plt.xlabel("System size, $L$", size = "15")
+plt.ylabel(r' Scaled average avalanche size, $\langle s \rangle /L $', size = "15")
+plt.grid()
+plt.ylim(1,1)
+plt.savefig("Testing 1.png", dpi = 1000)
+plt.show()
